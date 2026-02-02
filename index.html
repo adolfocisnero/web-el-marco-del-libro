@@ -24,8 +24,17 @@
             background-size: 300% 300%; animation: neonFlow 4s linear infinite;
         }
         .logo-img { width: 107px; height: 107px; border-radius: 50%; object-fit: cover; background: #050C17; }
-        .brand-box { display: inline-block; padding: 6px 20px; border: 1px solid transparent; border-image: var(--neon-tri) 1; background: rgba(0,0,0,0.4); }
-        .brand-name { font-family: 'Cinzel'; color: white; font-size: 18px; letter-spacing: 2px; margin: 0; }
+        
+        /* NOMBRE CON NEÓN DORADO MEJORADO */
+        .brand-name { 
+            font-family: 'Cinzel'; 
+            color: var(--gold); 
+            font-size: 20px; 
+            letter-spacing: 3px; 
+            margin: 0; 
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5), 0 0 20px rgba(255, 204, 0, 0.2);
+            font-weight: 700;
+        }
 
         @keyframes neonFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
@@ -42,10 +51,32 @@
         .msg-success { background: #1b4d31; color: #5effa3; }
         .msg-error { background: #4d1b1b; color: #ff5e5e; }
 
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; padding: 10px; }
-        .libro-card { background: var(--card); border-radius: 10px; border: 1px solid #1a2a3a; text-align: center; padding: 10px; }
-        .img-box { height: 120px; background: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .img-box img { max-height: 100%; max-width: 100%; }
+        /* ESTILO TARJETAS HORIZONTALES CON HALO */
+        .grid { display: flex; flex-direction: column; gap: 15px; padding: 10px; }
+        .libro-card { 
+            background: var(--neon-tri); 
+            background-size: 300% 300%;
+            animation: neonFlow 5s linear infinite;
+            padding: 1.5px; /* Borde del halo */
+            border-radius: 12px;
+            display: flex;
+        }
+        .card-body {
+            background: var(--card);
+            border-radius: 11px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+        }
+        .img-box { width: 90px; height: 120px; background: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+        .img-box img { max-height: 100%; max-width: 100%; object-fit: cover; }
+        .info-box { flex-grow: 1; text-align: left; }
+
+        .status { font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 5px; }
+        .status-ok { background: rgba(0, 255, 100, 0.15); color: #00ff64; border: 1px solid #00ff64; }
+        .status-no { background: rgba(255, 0, 0, 0.15); color: #ff3333; border: 1px solid #ff3333; }
 
         .nav-bot { position: fixed; bottom: 0; width: 100%; background: rgba(5, 12, 23, 0.95); display: flex; justify-content: space-around; padding: 18px 0; border-top: 1px solid #1a2a3a; z-index: 4000; }
         .nav-bot i { font-size: 24px; cursor: pointer; }
@@ -136,11 +167,9 @@
 
 <script>
     const API = "https://script.google.com/macros/s/AKfycbyd-3_A5xUQfNPSSwwnLPdCGcrW6nJBFXwRbfQag1xxjkODHxTMA2kPUd6wBeD-RuOV2A/exec";
-    
-    // DEFINICIÓN DE SONIDOS
     const SOUNDS = {
-        bubble: "https://www.myinstants.com/media/sounds/discord-notification.mp3", // Corto/Burbuja
-        kaching: "https://www.myinstants.com/media/sounds/ka-ching.mp3" // Caja Registradora
+        bubble: "https://www.myinstants.com/media/sounds/discord-notification.mp3",
+        kaching: "https://www.myinstants.com/media/sounds/ka-ching.mp3"
     };
     
     let inventario = [], carrito = [], user = JSON.parse(localStorage.getItem('user_marco')) || null, codS = null;
@@ -158,20 +187,33 @@
     }
 
     function renderTienda(data) {
-        document.getElementById('box-libros').innerHTML = data.map(l => `
+        document.getElementById('box-libros').innerHTML = data.map(l => {
+            const agotado = l.stock <= 0;
+            return `
             <div class="libro-card">
-                <div class="img-box"><img src="${l.imagen}"></div>
-                <b style="font-size:11px; display:block; height:28px; overflow:hidden; margin:8px 1px;">${l.titulo}</b>
-                <span style="color:var(--gold); font-weight:bold;">$${l.precio.toFixed(2)}</span>
-                <button class="btn-gold" onclick="add(${l.id})" style="padding:6px; font-size:10px; margin-top:8px;">AÑADIR</button>
-            </div>`).join('');
+                <div class="card-body">
+                    <div class="img-box"><img src="${l.imagen}"></div>
+                    <div class="info-box">
+                        <span class="status ${agotado ? 'status-no' : 'status-ok'}">
+                            ${agotado ? 'AGOTADO' : 'DISPONIBLE'}
+                        </span>
+                        <b style="font-size:14px; display:block; margin-bottom:5px; height:36px; overflow:hidden;">${l.titulo}</b>
+                        <span style="color:var(--gold); font-weight:bold; font-size:18px;">$${l.precio.toFixed(2)}</span>
+                        <button class="btn-gold" onclick="add(${l.id})" 
+                            style="padding:8px; font-size:11px; margin-top:8px; width:auto; padding-inline:15px;" 
+                            ${agotado ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : ''}>
+                            ${agotado ? 'SIN STOCK' : 'AÑADIR'}
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
     }
 
     function notify(m, t='success') {
         const el = document.getElementById('toast');
         el.innerHTML = `<div class="msg-card msg-${t}">${m}</div>`;
         el.style.display = 'block';
-        // Para notificaciones normales usamos el sonido de burbuja
         if(t === 'success') play('bubble');
         setTimeout(() => el.style.display = 'none', 2500);
     }
@@ -179,10 +221,11 @@
     function add(id) {
         if(!user) return abrirPanel('p-auth');
         const l = inventario.find(x => x.id === id);
+        if(l.stock <= 0) return notify("Producto agotado", "error");
         const ex = carrito.find(x => x.id === id);
         if(ex) ex.cant++; else carrito.push({...l, cant: 1});
         updateCart();
-        play('bubble'); // SONIDO CORTO AL AÑADIR
+        play('bubble');
         notify("Libro añadido");
     }
 
@@ -210,7 +253,7 @@
     function mod(i, v) { carrito[i].cant += v; if(carrito[i].cant <= 0) carrito.splice(i,1); play('bubble'); updateCart(); }
 
     async function finalizarCompra() {
-        play('kaching'); // SONIDO DE CAJA REGISTRADORA CLÁSICO AL CONFIRMAR
+        play('kaching');
         const tot = document.getElementById('total-cart').innerText;
         let detT = `🔔 <b>PEDIDO VIP</b>\n👤 <b>Cliente:</b> ${user.nombre}\n🛒 <b>Detalle:</b>\n`;
         carrito.forEach(x => detT += `📖 ${x.titulo} (x${x.cant}) - $${(x.precio*x.cant).toFixed(2)}\n`);
