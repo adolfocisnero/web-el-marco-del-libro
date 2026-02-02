@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Marco del Libro VIP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { 
+            --gold: #ffcc00; 
+            --blue: #0033a0; 
+            --red: #ce1126; 
+            --bg-radial: radial-gradient(circle, #0D1B2A 0%, #050C17 100%); 
+            --card: rgba(10, 20, 32, 0.95); 
+            --neon-tri: linear-gradient(45deg, #ffcc00, #0033a0, #ce1126, #ffcc00); 
+        }
+        body { background: var(--bg-radial); color: white; font-family: 'Montserrat', sans-serif; margin: 0; padding-bottom: 90px; min-height: 100vh; overflow-x: hidden; }
+        
+        .header-container { text-align: center; padding: 25px 0; }
+        .halo { 
+            width: 110px; height: 110px; margin: 0 auto 15px auto; padding: 1.5px; 
+            background: var(--neon-tri); border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            background-size: 300% 300%; animation: neonFlow 4s linear infinite;
+        }
+        .logo-img { width: 107px; height: 107px; border-radius: 50%; object-fit: cover; background: #050C17; }
+        .brand-box { display: inline-block; padding: 6px 20px; border: 1px solid transparent; border-image: var(--neon-tri) 1; background: rgba(0,0,0,0.4); }
+        .brand-name { font-family: 'Cinzel'; color: white; font-size: 18px; letter-spacing: 2px; margin: 0; }
+
+        @keyframes neonFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        .panel { position: fixed; inset: 0; background: var(--bg-radial); z-index: 5000; display: none; overflow-y: auto; padding: 20px; }
+        .active { display: block; }
+        .card-ui { background: var(--card); padding: 18px; border-radius: 12px; border: 1px solid #1a2a3a; max-width: 450px; margin: 12px auto; }
+        
+        input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #333; background: #000; color: white; box-sizing: border-box; }
+        .btn-gold { background: var(--gold); color: black; border: none; padding: 14px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; text-transform: uppercase; }
+        .btn-back { background: none; color: white; border: 1px solid #444; padding: 8px 12px; border-radius: 6px; cursor: pointer; margin-bottom: 15px; display: inline-flex; align-items: center; gap: 5px; font-size: 13px; }
+
+        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; display: none; width: 280px; }
+        .msg-card { padding: 12px; border-radius: 8px; text-align: center; font-weight: bold; border-bottom: 4px solid rgba(0,0,0,0.2); }
+        .msg-success { background: #1b4d31; color: #5effa3; }
+        .msg-error { background: #4d1b1b; color: #ff5e5e; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; padding: 10px; }
+        .libro-card { background: var(--card); border-radius: 10px; border: 1px solid #1a2a3a; text-align: center; padding: 10px; }
+        .img-box { height: 120px; background: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .img-box img { max-height: 100%; max-width: 100%; }
+
+        .nav-bot { position: fixed; bottom: 0; width: 100%; background: rgba(5, 12, 23, 0.95); display: flex; justify-content: space-around; padding: 18px 0; border-top: 1px solid #1a2a3a; z-index: 4000; }
+        .nav-bot i { font-size: 24px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<div id="main-view">
+    <div class="header-container">
+        <div class="halo"><img src="https://i.ibb.co/NgksQ0Sh/photo-2025-07-20-02-21-51.jpg" class="logo-img"></div>
+        <div class="brand-box"><h1 class="brand-name">EL MARCO DEL LIBRO</h1></div>
+        <div style="margin-top: 15px; padding: 0 20px;">
+            <input type="text" id="busq-tienda" placeholder="🔍 Buscar libro o autor..." onkeyup="filtrar('tienda')" autocomplete="off">
+        </div>
+    </div>
+    <div id="box-libros" class="grid"></div>
+</div>
+
+<div class="nav-bot">
+    <i class="fas fa-home" onclick="cerrarPaneles()" style="color:var(--gold);"></i>
+    <div onclick="abrirPanel('p-cart')" style="position:relative;">
+        <i class="fas fa-shopping-cart" style="color:white;"></i>
+        <span id="badge" style="position:absolute; top:-8px; right:-12px; background:red; padding:1px 6px; border-radius:50%; font-size:10px; display:none;">0</span>
+    </div>
+    <i class="fas fa-user-shield" onclick="irPerfil()" style="color:white;"></i>
+</div>
+
+<div id="p-admin" class="panel">
+    <button class="btn-back" onclick="cerrarPaneles()"><i class="fas fa-times"></i> Salir</button>
+    <div id="admin-summary" class="card-ui" style="text-align:center; font-weight:bold; background:var(--gold); color:black;"></div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:15px;">
+        <button class="btn-gold" onclick="verAdmin('inv')">STOCK</button>
+        <button class="btn-gold" onclick="verAdmin('ventas')">VENTAS</button>
+    </div>
+    <div id="cont-admin-tools" style="display:none;">
+        <button class="btn-gold" style="background:white; color:black; margin-bottom:10px;" onclick="abrirForm()">+ AÑADIR PRODUCTO</button>
+        <input type="text" id="busq-admin" placeholder="🔍 Buscar en inventario..." onkeyup="filtrar('admin')" autocomplete="off">
+    </div>
+    <div id="admin-content" style="padding-bottom:20px;"></div>
+    <button class="btn-gold" onclick="logout()" style="background:#444; color:white; margin-top:20px;">CERRAR SESIÓN</button>
+</div>
+
+<div id="p-cart" class="panel">
+    <button class="btn-back" onclick="cerrarPaneles()"><i class="fas fa-arrow-left"></i> Atrás</button>
+    <h2 style="text-align:center; color:var(--gold); font-family:Cinzel;">CARRITO VIP</h2>
+    <div id="cart-list"></div>
+    <div id="cart-footer" style="text-align:center; margin-top:20px; display:none;">
+        <h2 id="total-cart" style="color:var(--gold);"></h2>
+        <button class="btn-gold" onclick="finalizarCompra()">CONFIRMAR PEDIDO</button>
+    </div>
+</div>
+
+<div id="p-gracias" class="panel" style="text-align:center; padding-top:80px;">
+    <div class="halo"><img src="https://i.ibb.co/NgksQ0Sh/photo-2025-07-20-02-21-51.jpg" class="logo-img"></div>
+    <h1 style="color:var(--gold); font-family:Cinzel;">¡GRACIAS POR TU COMPRA!</h1>
+    <div class="card-ui">Estamos procesando tu pedido. Redirigiendo a WhatsApp...</div>
+</div>
+
+<div id="p-form" class="panel">
+    <div class="card-ui">
+        <button class="btn-back" onclick="abrirPanel('p-admin')"><i class="fas fa-arrow-left"></i> Volver al panel</button>
+        <h2 id="form-title" style="text-align:center; color:var(--gold);">DATOS LIBRO</h2>
+        <input type="hidden" id="f-id"><input type="text" id="f-titulo" placeholder="Título"><input type="number" id="f-precio" placeholder="Precio $"><input type="number" id="f-stock" placeholder="Stock"><input type="file" id="f-file"><input type="hidden" id="f-img-url">
+        <button class="btn-gold" id="btn-save-prod" onclick="guardarProducto()">GUARDAR CAMBIOS</button>
+    </div>
+</div>
+
+<div id="p-auth" class="panel">
+    <button class="btn-back" onclick="cerrarPaneles()"><i class="fas fa-arrow-left"></i> Atrás</button>
+    <div class="card-ui" id="v-login">
+        <h2 style="text-align:center; color:var(--gold);">INICIAR SESIÓN</h2>
+        <input type="email" id="l-email" placeholder="Correo"><input type="password" id="l-pass" placeholder="Contraseña">
+        <button class="btn-gold" onclick="login()">ENTRAR</button>
+        <p onclick="cambiarVista('v-reg')" style="text-align:center; color:gray; cursor:pointer; margin-top:15px;">¿No tienes cuenta? <b>Regístrate</b></p>
+    </div>
+    <div class="card-ui" id="v-reg" style="display:none;">
+        <h2 style="text-align:center; color:var(--gold);">REGISTRO</h2>
+        <input type="text" id="r-nom" placeholder="Nombre"><input type="email" id="r-email" placeholder="Correo"><input type="tel" id="r-tel" placeholder="WhatsApp"><input type="password" id="r-pass" placeholder="Contraseña">
+        <button class="btn-gold" id="btn-cod" onclick="solicitarCodigo()">PEDIR CÓDIGO</button>
+        <div id="sec-cod" style="display:none; margin-top:10px;">
+            <input type="number" id="v-cod" placeholder="Código de 4 dígitos">
+            <button class="btn-gold" onclick="validarRegistro()" style="background:#28a745; color:white;">VERIFICAR</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API = "https://script.google.com/macros/s/AKfycbyd-3_A5xUQfNPSSwwnLPdCGcrW6nJBFXwRbfQag1xxjkODHxTMA2kPUd6wBeD-RuOV2A/exec";
+    
+    // DEFINICIÓN DE SONIDOS
+    const SOUNDS = {
+        bubble: "https://www.myinstants.com/media/sounds/discord-notification.mp3", // Corto/Burbuja
+        kaching: "https://www.myinstants.com/media/sounds/ka-ching.mp3" // Caja Registradora
+    };
+    
+    let inventario = [], carrito = [], user = JSON.parse(localStorage.getItem('user_marco')) || null, codS = null;
+
+    async function init() {
+        const res = await fetch(`${API}?action=obtenerInventario`);
+        inventario = await res.json();
+        renderTienda(inventario);
+    }
+
+    function play(s) { 
+        const audio = new Audio(SOUNDS[s]);
+        audio.currentTime = 0;
+        audio.play().catch(e => console.log("Audio en espera")); 
+    }
+
+    function renderTienda(data) {
+        document.getElementById('box-libros').innerHTML = data.map(l => `
+            <div class="libro-card">
+                <div class="img-box"><img src="${l.imagen}"></div>
+                <b style="font-size:11px; display:block; height:28px; overflow:hidden; margin:8px 1px;">${l.titulo}</b>
+                <span style="color:var(--gold); font-weight:bold;">$${l.precio.toFixed(2)}</span>
+                <button class="btn-gold" onclick="add(${l.id})" style="padding:6px; font-size:10px; margin-top:8px;">AÑADIR</button>
+            </div>`).join('');
+    }
+
+    function notify(m, t='success') {
+        const el = document.getElementById('toast');
+        el.innerHTML = `<div class="msg-card msg-${t}">${m}</div>`;
+        el.style.display = 'block';
+        // Para notificaciones normales usamos el sonido de burbuja
+        if(t === 'success') play('bubble');
+        setTimeout(() => el.style.display = 'none', 2500);
+    }
+
+    function add(id) {
+        if(!user) return abrirPanel('p-auth');
+        const l = inventario.find(x => x.id === id);
+        const ex = carrito.find(x => x.id === id);
+        if(ex) ex.cant++; else carrito.push({...l, cant: 1});
+        updateCart();
+        play('bubble'); // SONIDO CORTO AL AÑADIR
+        notify("Libro añadido");
+    }
+
+    function updateCart() {
+        const can = carrito.reduce((a,b)=> a+b.cant, 0);
+        document.getElementById('badge').innerText = can;
+        document.getElementById('badge').style.display = can > 0 ? 'block' : 'none';
+        let total = 0;
+        document.getElementById('cart-list').innerHTML = carrito.map((it, i) => {
+            total += it.precio * it.cant;
+            return `<div class="card-ui" style="display:flex; align-items:center; gap:10px;">
+                <img src="${it.imagen}" width="40" height="50" style="object-fit:cover;">
+                <div style="flex:1;"><b>${it.titulo}</b><br>$${it.precio}</div>
+                <div style="display:flex; align-items:center; gap:5px;">
+                    <button style="background:none; border:1px solid #444; color:white; width:25px;" onclick="mod(${i},-1)">-</button>
+                    <b>${it.cant}</b>
+                    <button style="background:none; border:1px solid #444; color:white; width:25px;" onclick="mod(${i},1)">+</button>
+                </div>
+            </div>`;
+        }).join('');
+        document.getElementById('total-cart').innerText = `TOTAL: $${total.toFixed(2)}`;
+        document.getElementById('cart-footer').style.display = can > 0 ? 'block' : 'none';
+    }
+
+    function mod(i, v) { carrito[i].cant += v; if(carrito[i].cant <= 0) carrito.splice(i,1); play('bubble'); updateCart(); }
+
+    async function finalizarCompra() {
+        play('kaching'); // SONIDO DE CAJA REGISTRADORA CLÁSICO AL CONFIRMAR
+        const tot = document.getElementById('total-cart').innerText;
+        let detT = `🔔 <b>PEDIDO VIP</b>\n👤 <b>Cliente:</b> ${user.nombre}\n🛒 <b>Detalle:</b>\n`;
+        carrito.forEach(x => detT += `📖 ${x.titulo} (x${x.cant}) - $${(x.precio*x.cant).toFixed(2)}\n`);
+        detT += `💰 <b>${tot}</b>`;
+        
+        abrirPanel('p-gracias');
+        await fetch(API, { method: 'POST', body: JSON.stringify({
+            action: 'finalizarVenta', cliente: user.nombre, telefono: user.telefono,
+            detalleExcel: carrito.map(x=> `${x.titulo} (x${x.cant})`).join(' | '),
+            total: tot.replace('TOTAL: $',''), resumenTelegram: detT, items: carrito
+        })});
+        setTimeout(() => window.location.href = `https://wa.me/584127145675?text=${encodeURIComponent(detT.replace(/<[^>]*>/g, ''))}`, 2000);
+    }
+
+    async function verAdmin(tipo) {
+        const cont = document.getElementById('admin-content');
+        cont.innerHTML = "Cargando...";
+        document.getElementById('cont-admin-tools').style.display = tipo === 'inv' ? 'block' : 'none';
+        if(tipo === 'inv') {
+            document.getElementById('admin-summary').innerText = "STOCK";
+            renderAdminList(inventario);
+        } else {
+            const res = await fetch(`${API}?action=obtenerVentas`);
+            const v = await res.json();
+            document.getElementById('admin-summary').innerText = "HISTORIAL";
+            cont.innerHTML = `<button class="btn-gold" style="background:red; color:white; margin-bottom:15px;" onclick="eliminar('Ventas', 0, true)">BORRAR HISTORIAL</button>` +
+                v.map(v => `<div class="card-ui" style="font-size:11px;"><span style="color:var(--gold);">${new Date(v[0]).toLocaleString()}</span><br><b>${v[1]}</b>: $${v[3]}<br>${v[2]}</div>`).reverse().join('');
+        }
+    }
+
+    function renderAdminList(data) {
+        document.getElementById('admin-content').innerHTML = data.map(l => `
+            <div class="card-ui" style="display:flex; align-items:center; gap:8px;">
+                <img src="${l.imagen}" width="35" height="45" style="object-fit:cover;">
+                <div style="flex:1; font-size:12px;"><b>${l.titulo}</b><br>Stock: ${l.stock}</div>
+                <i class="fas fa-edit" style="color:var(--gold); padding:8px;" onclick='abrirForm(${JSON.stringify(l)})'></i>
+                <i class="fas fa-trash" style="color:red; padding:8px;" onclick="eliminar('Inventario', ${l.id})"></i>
+            </div>`).join('');
+    }
+
+    function abrirForm(l = null) {
+        abrirPanel('p-form');
+        document.getElementById('f-id').value = l ? l.id : "";
+        document.getElementById('f-titulo').value = l ? l.titulo : "";
+        document.getElementById('f-precio').value = l ? l.precio : "";
+        document.getElementById('f-stock').value = l ? l.stock : "";
+        document.getElementById('f-img-url').value = l ? l.imagen : "";
+        document.getElementById('form-title').innerText = l ? "EDITAR LIBRO" : "NUEVO LIBRO";
+    }
+
+    async function guardarProducto() {
+        const btn = document.getElementById('btn-save-prod'); btn.disabled = true; btn.innerText = "GUARDANDO...";
+        const file = document.getElementById('f-file').files[0];
+        let p = { action: 'gestionarLibro', id: document.getElementById('f-id').value, titulo: document.getElementById('f-titulo').value, precio: document.getElementById('f-precio').value, stock: document.getElementById('f-stock').value, imagen: document.getElementById('f-img-url').value };
+        const enviar = async (payload) => {
+            await fetch(API, { method: 'POST', body: JSON.stringify(payload) });
+            const r = await fetch(`${API}?action=obtenerInventario`);
+            inventario = await r.json();
+            verAdmin('inv'); abrirPanel('p-admin'); notify("Guardado con éxito");
+            btn.disabled = false; btn.innerText = "GUARDAR CAMBIOS";
+        };
+        if(file) {
+            const r = new FileReader(); r.readAsDataURL(file);
+            r.onload = () => { p.archivoBase64 = r.result; enviar(p); };
+        } else enviar(p);
+    }
+
+    async function eliminar(tabla, id, todo = false) {
+        if(!confirm("¿Seguro que deseas eliminar?")) return;
+        await fetch(API, { method: 'POST', body: JSON.stringify({ action: todo?'vaciarVentas':'eliminarFila', tabla: tabla, id: id })});
+        if(todo) location.reload(); else {
+            const r = await fetch(`${API}?action=obtenerInventario`);
+            inventario = await r.json(); verAdmin('inv');
+        }
+    }
+
+    function filtrar(modo) {
+        const t = document.getElementById(modo === 'tienda' ? 'busq-tienda' : 'busq-admin').value.toLowerCase();
+        const filt = inventario.filter(x => x.titulo.toLowerCase().includes(t));
+        if(modo === 'tienda') renderTienda(filt); else renderAdminList(filt);
+    }
+
+    function abrirPanel(id) { cerrarPaneles(); document.getElementById(id).classList.add('active'); }
+    function cerrarPaneles() { document.querySelectorAll('.panel').forEach(p => p.classList.remove('active')); }
+    function cambiarVista(v) { document.getElementById('v-login').style.display = v==='v-reg'?'none':'block'; document.getElementById('v-reg').style.display = v==='v-reg'?'block':'none'; }
+    function irPerfil() { if(!user) abrirPanel('p-auth'); else if(user.rol === 'ADMIN') { abrirPanel('p-admin'); verAdmin('inv'); } else notify("Bienvenido, " + user.nombre); }
+    async function login() {
+        const res = await fetch(`${API}?action=login&correo=${document.getElementById('l-email').value}&pass=${document.getElementById('l-pass').value}`);
+        const data = await res.json();
+        if(data.success) { localStorage.setItem('user_marco', JSON.stringify(data)); location.reload(); } else notify("Error de acceso", "error");
+    }
+    function logout() { localStorage.removeItem('user_marco'); location.reload(); }
+    async function solicitarCodigo() {
+        notify("Enviando código...");
+        const res = await fetch(`${API}?action=enviarCodigo&correo=${document.getElementById('r-email').value}`);
+        const data = await res.json(); codS = data.codigo;
+        document.getElementById('sec-cod').style.display = 'block'; notify("Código enviado al mail");
+    }
+    async function validarRegistro() {
+        if(document.getElementById('v-cod').value != codS) return notify("Código incorrecto", "error");
+        await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'registrarUsuario', nombre: document.getElementById('r-nom').value, correo: document.getElementById('r-email').value, telefono: document.getElementById('r-tel').value, pass: document.getElementById('r-pass').value })});
+        notify("Registro completado"); cambiarVista('v-login');
+    }
+
+    init();
+</script>
+</body>
+</html>
