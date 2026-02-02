@@ -17,18 +17,20 @@
         }
         body { background: var(--bg-radial); color: white; font-family: 'Montserrat', sans-serif; margin: 0; padding-bottom: 90px; min-height: 100vh; overflow-x: hidden; }
         
-        .header-container { text-align: center; padding: 25px 0; }
+        .header-container { text-align: center; padding: 30px 0; }
+        
+        /* LOGO MÁS GRANDE */
         .halo-circle { 
-            width: 110px; height: 110px; margin: 0 auto 15px auto; padding: 2px; 
+            width: 140px; height: 140px; margin: 0 auto 20px auto; padding: 3px; 
             background: var(--neon-tri); border-radius: 50%; display: flex; align-items: center; justify-content: center; 
             background-size: 300% 300%; animation: neonFlow 4s linear infinite;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.3);
         }
-        .logo-img { width: 106px; height: 106px; border-radius: 50%; object-fit: cover; background: #050C17; }
+        .logo-img { width: 135px; height: 135px; border-radius: 50%; object-fit: cover; background: #050C17; }
         
-        /* HALO RECTANGULAR RESTAURADO */
         .brand-box { 
             display: inline-block; 
-            padding: 8px 25px; 
+            padding: 10px 30px; 
             background: rgba(0,0,0,0.6); 
             position: relative;
             border-radius: 4px;
@@ -43,13 +45,12 @@
         }
 
         .brand-name { 
-            font-family: 'Cinzel'; color: white; font-size: 20px; letter-spacing: 3px; margin: 0; 
-            text-shadow: 0 0 8px var(--gold);
+            font-family: 'Cinzel'; color: white; font-size: 22px; letter-spacing: 4px; margin: 0; 
+            text-shadow: 0 0 10px var(--gold);
         }
 
         @keyframes neonFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        /* GRID RESPONSIVO: 1 columna en móvil, 2 o más en PC */
         .grid { 
             display: grid; 
             grid-template-columns: 1fr; 
@@ -71,15 +72,32 @@
             background: var(--card); border-radius: 11px; padding: 12px;
             display: flex; align-items: center; gap: 15px; width: 100%;
         }
-        .img-box { width: 90px; height: 120px; background: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
-        .img-box img { max-height: 100%; max-width: 100%; object-fit: cover; }
+
+        /* IMAGEN CON MÁS FONDO BLANCO (MENOS APRETADA) */
+        .img-box { 
+            width: 100px; 
+            height: 130px; 
+            background: white; 
+            border-radius: 6px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden; 
+            flex-shrink: 0;
+            padding: 8px; /* Este espacio hace que la imagen no se vea apretada */
+            box-sizing: border-box;
+        }
+        .img-box img { 
+            max-height: 100%; 
+            max-width: 100%; 
+            object-fit: contain; /* Cambiado a contain para que se vea el libro completo */
+        }
         
         .info-box { flex-grow: 1; text-align: left; }
         .status { font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 5px; }
         .status-ok { background: rgba(0, 255, 100, 0.15); color: #00ff64; border: 1px solid #00ff64; }
         .status-no { background: rgba(255, 0, 0, 0.15); color: #ff3333; border: 1px solid #ff3333; }
 
-        /* PANEL DE ADMINISTRACIÓN MEJORADO */
         #admin-content { display: flex; flex-direction: column; gap: 12px; max-width: 600px; margin: 0 auto; }
         .admin-card { display: flex; align-items: center; gap: 15px; padding: 15px; background: var(--card); border-radius: 10px; border: 1px solid #333; }
 
@@ -89,8 +107,7 @@
         
         input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #333; background: #000; color: white; box-sizing: border-box; }
         .btn-gold { background: var(--gold); color: black; border: none; padding: 14px; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; text-transform: uppercase; transition: 0.3s; }
-        .btn-gold:active { transform: scale(0.95); }
-
+        
         .nav-bot { position: fixed; bottom: 0; width: 100%; background: rgba(5, 12, 23, 0.95); display: flex; justify-content: space-around; padding: 18px 0; border-top: 1px solid #1a2a3a; z-index: 4000; }
         .nav-bot i { font-size: 24px; cursor: pointer; color: white; }
 
@@ -108,7 +125,7 @@
     <div class="header-container">
         <div class="halo-circle"><img src="https://i.ibb.co/NgksQ0Sh/photo-2025-07-20-02-21-51.jpg" class="logo-img"></div>
         <div class="brand-box"><h1 class="brand-name">EL MARCO DEL LIBRO</h1></div>
-        <div style="margin-top: 20px; padding: 0 20px; max-width: 500px; margin-inline: auto;">
+        <div style="margin-top: 25px; padding: 0 20px; max-width: 500px; margin-inline: auto;">
             <input type="text" id="busq-tienda" placeholder="🔍 Buscar libro o autor..." onkeyup="filtrar('tienda')" autocomplete="off">
         </div>
     </div>
@@ -125,7 +142,7 @@
 </div>
 
 <div id="p-admin" class="panel">
-    <button class="btn-back" onclick="cerrarPaneles()"><i class="fas fa-times"></i> Salir</button>
+    <button class="btn-back" onclick="cerrarPaneles()" style="background:none; color:white; border:1px solid #444; padding:8px 12px; border-radius:6px; cursor:pointer; margin-bottom:15px;"><i class="fas fa-times"></i> Salir</button>
     <div id="admin-summary" class="card-ui" style="text-align:center; font-weight:bold; background:var(--gold); color:black;">PANEL CONTROL</div>
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:15px; max-width:450px; margin-inline:auto;">
         <button class="btn-gold" onclick="verAdmin('inv')">STOCK</button>
@@ -140,7 +157,7 @@
 </div>
 
 <div id="p-cart" class="panel">
-    <button class="btn-back" onclick="cerrarPaneles()"><i class="fas fa-arrow-left"></i> Atrás</button>
+    <button class="btn-back" onclick="cerrarPaneles()" style="background:none; color:white; border:1px solid #444; padding:8px 12px; border-radius:6px; cursor:pointer; margin-bottom:15px;"><i class="fas fa-arrow-left"></i> Atrás</button>
     <h2 style="text-align:center; color:var(--gold); font-family:Cinzel;">CARRITO VIP</h2>
     <div id="cart-list"></div>
     <div id="cart-footer" style="text-align:center; margin-top:20px; display:none;">
@@ -157,7 +174,7 @@
 
 <div id="p-form" class="panel">
     <div class="card-ui">
-        <button class="btn-back" onclick="abrirPanel('p-admin')"><i class="fas fa-arrow-left"></i> Volver</button>
+        <button class="btn-back" onclick="abrirPanel('p-admin')" style="background:none; color:white; border:1px solid #444; padding:8px 12px; border-radius:6px; cursor:pointer; margin-bottom:15px;"><i class="fas fa-arrow-left"></i> Volver</button>
         <h2 id="form-title" style="text-align:center; color:var(--gold);">DATOS LIBRO</h2>
         <input type="hidden" id="f-id"><input type="text" id="f-titulo" placeholder="Título"><input type="number" id="f-precio" placeholder="Precio $"><input type="number" id="f-stock" placeholder="Stock"><input type="file" id="f-file"><input type="hidden" id="f-img-url">
         <button class="btn-gold" id="btn-save-prod" onclick="guardarProducto()">GUARDAR</button>
@@ -165,7 +182,7 @@
 </div>
 
 <div id="p-auth" class="panel">
-    <button class="btn-back" onclick="cerrarPaneles()"><i class="fas fa-arrow-left"></i> Atrás</button>
+    <button class="btn-back" onclick="cerrarPaneles()" style="background:none; color:white; border:1px solid #444; padding:8px 12px; border-radius:6px; cursor:pointer; margin-bottom:15px;"><i class="fas fa-arrow-left"></i> Atrás</button>
     <div class="card-ui" id="v-login">
         <h2 style="text-align:center; color:var(--gold);">INICIAR SESIÓN</h2>
         <input type="email" id="l-email" placeholder="Correo"><input type="password" id="l-pass" placeholder="Contraseña">
@@ -292,7 +309,7 @@
     function renderAdminList(data) {
         document.getElementById('admin-content').innerHTML = data.map(l => `
             <div class="admin-card">
-                <img src="${l.imagen}" width="60" height="80" style="object-fit:cover; border-radius:4px;">
+                <div class="img-box" style="width:60px; height:80px; padding:4px;"><img src="${l.imagen}"></div>
                 <div style="flex:1;">
                     <b style="font-size:16px;">${l.titulo}</b><br>
                     <span style="color:var(--gold);">Precio: $${l.precio}</span><br>
